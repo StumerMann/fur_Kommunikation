@@ -2,12 +2,13 @@
 #include <PubSubClient.h>
 #include <SPI.h>
 #include <Ethernet.h>
-#define nonormal 8
-#define normal 9
-#define temperature A0
-#define changing 10
+#define nonormal 8 // Пин светоидиода, работающего когда температура проблемна
+#define normal 9 // Пин светоидиода, работающего когда температура нормальна
+#define temperature A0 // Пин терморезистора
+#define changing 10 // Пин светодиоида, работающего от mqtt-запросов
  
-boolean kek = false;
+boolean kek = false; // Почему-то не работает через него. Поменять 
+ 
 // Update these with values suitable for your network.
 byte mac[] = { 0xDE, 0xED, 0xBA, 0xFE, 0xFE, 0xED };
 IPAddress ip(192,168,1,109);
@@ -19,11 +20,11 @@ void callback(char* topic, byte* payload, unsigned int length) {
   String myString = "w";
   for (int i=0;i<length;i++) {
     Serial.print((char)payload[i]);
-    myString = myString + (char)payload[i];
+    myString = myString + (char)payload[i]; 
   }
   Serial.println();
-  Serial.println(myString);
-  if (myString == "woff"){
+  Serial.println(myString); // Для проверки
+  if (myString == "woff"){ 
     digitalWrite(changing, LOW);
     Serial.println("LOWER");
     kek = false;
@@ -45,12 +46,12 @@ void reconnect() {
   {
     Serial.print("Attempting MQTT connection...");
     // Attempt to connect
-    if (client.connect("44doidaklalbjkba", "#", "#")) {
+    if (client.connect("identification_name", "#", "#")) { // # - название юзера и пороль, если есть
       Serial.println("connected");
       // Once connected, publish an announcement...
-      client.publish("#/test","hello world");
+      client.publish("test","hello world");
       // ... and resubscribe
-      client.subscribe("#/output");
+      client.subscribe("output");
       } 
     else {
       Serial.print("failed, rc=");
@@ -66,7 +67,7 @@ void setup()
 {
   Serial.begin(9600);
  
-  client.setServer("maqiatto.com", 1883);
+  client.setServer("#", 1883); # - айпи или адресс
   client.setCallback(callback);
  
   Ethernet.begin(mac, ip);
@@ -93,7 +94,7 @@ void loop()
   String stringOne = String(temperature, 3);
   char charBuf[50];
   stringOne.toCharArray(charBuf, 50);
-  client.publish( "#/test", charBuf );
+  client.publish( "test", charBuf );
  
   if (temperature > 30.0){
     digitalWrite(nonormal, HIGH);
