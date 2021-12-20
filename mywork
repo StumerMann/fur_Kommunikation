@@ -87,14 +87,24 @@ void loop()
   temperatureOutside = 0;
   humidity = 0; 
   
-  if ( conditionerFirstMode
-  
   if (temperatureOutside <= 15 && humidity < 60 && temperatureInside >= 22 && fanMode == 2){
     digitalWrite(fan, HIGH);
+    digitalWrite(conditionerFirst, LOW);
+    digitalWrite(conditionerSecond, LOW);
   }
   else if (temperatureOutside > 15 || humidity >= 60 || temperatureInside <= 20){
     if (fanMode == 2){
       digitalWrite(fan, LOW);
+    }
+    if (temperatureInside > 24 && conditionerFirstMode == 2){
+      digitalWrite(conditionerFirst, HIGH);
+      if (temperatureInside > 26){
+        digitalWrite(conditionerSecond, HIGH);
+      }
+    }
+    else if(temperatureInside <= 22){
+      digitalWrite(conditionerFirt, LOW);
+      digitalWrite(conditionerSecond, HIGH);
     }
   }
   
